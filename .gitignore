@@ -1,0 +1,18 @@
+# Bytecode / caché de Python
+__pycache__/
+*.pyc
+
+# Entornos virtuales (por si se usan)
+.venv/
+venv/
+env/
+
+# Datos personales del export de Instagram, en cualquier carpeta que los contenga
+followers_1.json
+following.json
+personal_information.json
+followers_and_following/
+instagram_export/
+
+# Resultado generado por el script (contiene tu lista de seguidores/seguidos)
+personas_que_no_te_siguen_de_vuelta_instagram_*.txt
