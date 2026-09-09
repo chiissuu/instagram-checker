@@ -1,0 +1,5 @@
+# Solo necesario si vas a usar la verificación en línea (opcional) del script.
+# Instálalo con:
+#     pip install -r requirements-optional.txt
+#     playwright install chromium
+playwright

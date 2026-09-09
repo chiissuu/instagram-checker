@@ -16,3 +16,8 @@ instagram_export/
 
 # Resultado generado por el script (contiene tu lista de seguidores/seguidos)
 personas_que_no_te_siguen_de_vuelta_instagram_*.txt
+personas_que_no_te_siguen_de_vuelta_instagram_*.csv
+personas_que_no_te_siguen_de_vuelta_instagram_*.json
+
+# Caché de la verificación en línea (contiene nombres de cuenta)
+verificacion_cache.json

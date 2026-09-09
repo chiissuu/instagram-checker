@@ -1,156 +1,152 @@
 ===============================================================
- INSTAGRAM CHECKER - GUIA DE USO
+ INSTAGRAM CHECKER - USER GUIDE
 ===============================================================
 
-Este programa compara tus "seguidores" y "seguidos" de Instagram
-y genera un archivo .txt con las personas a las que sigues pero
-que no te siguen de vuelta.
+This program compares your Instagram "followers" and "following"
+and generates a file listing the people you follow who don't
+follow you back.
 
-Para que funcione necesitas 3 cosas:
-  1. Tener Python instalado en tu ordenador.
-  2. Descargar tu información de Instagram (el export).
-  3. Ejecutar el script checker.py.
+To make it work you need 3 things:
+  1. Have Python installed on your computer.
+  2. Download your Instagram information (the export).
+  3. Run the checker.py script.
 
-A continuación se explica cada paso.
-
-
----------------------------------------------------------------
-1. COMO DESCARGAR TU INFORMACION DE INSTAGRAM
----------------------------------------------------------------
-
-Instagram permite descargar toda la información de tu cuenta
-(seguidores, seguidos, mensajes, fotos, etc.) desde el
-"Centro de cuentas". El proceso es igual tanto si lo haces
-desde el móvil (app) como desde el ordenador (navegador web).
-
-  1. Entra en Instagram (app o instagram.com) y accede a tu
-     perfil.
-  2. Entra en "Configuración y privacidad".
-  3. Entra en "Centro de cuentas".
-  4. Pulsa en "Tu información y permisos".
-  5. Pulsa en "Descargar tu información".
-  6. Selecciona tu cuenta de Instagram y pulsa en "Crear
-     archivo de exportación".
-
-  Al crear el archivo de exportación tendrás que elegir varias
-  opciones. Se recomienda configurarlas así:
-
-    - Información a incluir: selecciona SOLO "Seguidores y
-      seguidos". No hace falta marcar el resto de categorías,
-      el script solo usa esta.
-
-    - Intervalo de fechas: el que tú prefieras, pero para
-      asegurar el mejor resultado (que no falte nadie en el
-      listado) se recomienda elegir "Todas las fechas" /
-      "Todo el periodo".
-
-    - Formato: OBLIGATORIAMENTE "JSON" (no "HTML"), ya que el
-      script solo sabe leer archivos JSON.
-
-    - Calidad de los archivos multimedia: "Baja". No se van a
-      exportar fotos ni vídeos, así que esta opción no influye
-      en el resultado, y hace que el archivo pese menos.
-
-    - Destino: puedes elegir descargarlo directamente a tu
-      dispositivo, o transferirlo a un servicio externo como
-      Google Drive, Dropbox, etc. (las opciones exactas pueden
-      variar un poco entre la app y la web). Elige lo que te
-      resulte más cómodo. En cualquier caso, Instagram te
-      avisará por notificación o correo cuando el archivo esté
-      listo para descargar; ese aviso llega independientemente
-      del destino que elijas, no es en sí mismo una opción de
-      destino.
-
-  7. Confirma la solicitud. Instagram tardará desde unos minutos
-     hasta varias horas en preparar el archivo.
-  8. Cuando recibas el aviso, entra de nuevo en "Descargar tu
-     información" (o al servicio externo elegido) y descarga
-     el archivo .zip.
-
-Nota: si Instagram entrega el archivo a través de Google Drive,
-a veces lo divide en varias partes (por ejemplo
-"...-1-001.zip", "...-1-002.zip"). Si te pasa esto, descomprime
-todas las partes y copia el contenido de todas ellas en alguna
-carpeta junto al script checker.py (ver siguiente punto).
+Each step is explained below.
 
 
 ---------------------------------------------------------------
-2. QUE HACER CON EL ARCHIVO DESCARGADO
+1. HOW TO DOWNLOAD YOUR INSTAGRAM INFORMATION
 ---------------------------------------------------------------
 
-  1. Descomprime el/los archivo(s) .zip que te ha dado Instagram.
-  2. Verás una carpeta con subcarpetas dentro (followers_and_following,
-     personal_information, etc.).
-  3. Copia TODO el contenido descomprimido dentro de CUALQUIER
-     carpeta que esté junto al script checker.py. El nombre de
-     esa carpeta da igual (puede llamarse como quieras, o
-     conservar el nombre que traiga de Instagram).
+Instagram lets you download all of your account's information
+(followers, following, messages, photos, etc.) from the
+"Accounts Center". The process is the same whether you do it
+from your phone (app) or your computer (web browser).
 
-La estructura final debe quedar más o menos así:
+  1. Open Instagram (app or instagram.com) and go to your
+     profile.
+  2. Go to "Settings and privacy".
+  3. Go to "Accounts Center".
+  4. Tap "Your information and permissions".
+  5. Tap "Download your information".
+  6. Select your Instagram account and tap "Create export
+     file".
+
+  When creating the export file you'll need to choose several
+  options. It's recommended to set them like this:
+
+    - Information to include: select ONLY "Followers and
+      following". You don't need to check the rest of the
+      categories, the script only uses this one.
+
+    - Date range: whichever you prefer, but to get the best
+      result (so nobody is missing from the list) it's
+      recommended to choose "All time".
+
+    - Format: MUST be "JSON" (not "HTML"), since the script can
+      only read JSON files.
+
+    - Media quality: "Low". No photos or videos get exported
+      anyway, so this option doesn't affect the result, and it
+      keeps the file smaller.
+
+    - Destination: you can choose to download it straight to
+      your device, or transfer it to an external service like
+      Google Drive, Dropbox, etc. (the exact options can vary a
+      bit between the app and the website). Pick whichever is
+      more convenient for you. Either way, Instagram will
+      notify you by notification or email once the file is
+      ready to download; that notice arrives regardless of the
+      destination you choose, it isn't a destination option in
+      itself.
+
+  7. Confirm the request. Instagram will take anywhere from a
+     few minutes to several hours to prepare the file.
+  8. Once you get the notification, go back into "Download your
+     information" (or the external service you chose) and
+     download the .zip file.
+
+Note: if Instagram delivers the file through Google Drive, it
+sometimes splits it into several parts (for example
+"...-1-001.zip", "...-1-002.zip"). If that happens, unzip all
+the parts and copy the contents of all of them into a folder
+next to the checker.py script (see next step).
+
+
+---------------------------------------------------------------
+2. WHAT TO DO WITH THE DOWNLOADED FILE
+---------------------------------------------------------------
+
+  1. Unzip the .zip file(s) Instagram gave you.
+  2. You'll see a folder with subfolders inside
+     (followers_and_following, personal_information, etc.).
+  3. Copy ALL of the unzipped contents into ANY folder next to
+     the checker.py script. That folder's name doesn't matter
+     (you can name it whatever you want, or keep the name
+     Instagram gave it).
+
+The final structure should look roughly like this:
 
   instagram-checker/
     checker.py
-    followers_and_following/     <- el nombre da igual
+    followers_and_following/     <- the name doesn't matter
       followers_1.json
       following.json
       personal_information/
         ...
 
-NO hace falta modificar nada dentro del script checker.py, ni
-crear una carpeta con un nombre concreto: el script busca, de
-forma recursiva, en TODAS las carpetas y subcarpetas que haya
-junto a checker.py (entrando en todos los niveles, sin importar
-cuántos haya) hasta encontrar followers_1.json y following.json,
-estén donde estén y se llame como se llame la carpeta que los
-contiene. Basta con descomprimir el zip y copiar su contenido
-en algún sitio dentro de la carpeta del proyecto.
+You DON'T need to modify anything inside the checker.py script,
+nor create a folder with a specific name: the script recursively
+searches EVERY folder and subfolder next to checker.py (going
+through every level, no matter how many there are) until it
+finds followers_1.json and following.json, wherever they are and
+whatever the containing folder is called. Just unzip the file
+and copy its contents somewhere inside the project folder.
 
 
 ---------------------------------------------------------------
-3. COMO INSTALAR PYTHON
+3. HOW TO INSTALL PYTHON
 ---------------------------------------------------------------
 
-El script está escrito en Python, así que necesitas tenerlo
-instalado para poder ejecutarlo.
+The script is written in Python, so you need to have it
+installed to run it.
 
 --- Windows ---
 
-  1. Ve a https://www.python.org/downloads/ y descarga la última
-     versión de Python para Windows.
-  2. Ejecuta el instalador descargado.
-  3. IMPORTANTE: marca la casilla "Add Python to PATH" antes de
-     pulsar "Install Now".
-  4. Una vez instalado, abre una terminal (cmd o PowerShell) y
-     escribe:
+  1. Go to https://www.python.org/downloads/ and download the
+     latest version of Python for Windows.
+  2. Run the downloaded installer.
+  3. IMPORTANT: check the "Add Python to PATH" box before
+     clicking "Install Now".
+  4. Once installed, open a terminal (cmd or PowerShell) and
+     type:
          python --version
-     Si te muestra un número de versión, está instalado
-     correctamente.
+     If it shows a version number, it's installed correctly.
 
 --- macOS ---
 
-  Opción A (recomendada, con Homebrew):
-    1. Instala Homebrew si no lo tienes (https://brew.sh).
-    2. Abre la Terminal y ejecuta:
+  Option A (recommended, with Homebrew):
+    1. Install Homebrew if you don't have it (https://brew.sh).
+    2. Open Terminal and run:
          brew install python3
-    3. Comprueba la instalación con:
+    3. Check the installation with:
          python3 --version
 
-  Opción B (instalador oficial):
-    1. Ve a https://www.python.org/downloads/ y descarga el
-       instalador para macOS.
-    2. Ábrelo y sigue los pasos del asistente.
-    3. Comprueba la instalación abriendo la Terminal y
-       escribiendo:
+  Option B (official installer):
+    1. Go to https://www.python.org/downloads/ and download the
+       installer for macOS.
+    2. Open it and follow the setup steps.
+    3. Check the installation by opening Terminal and typing:
          python3 --version
 
 --- Linux ---
 
-  La mayoría de distribuciones ya traen Python instalado. Para
-  comprobarlo, abre una terminal y escribe:
+  Most distributions already come with Python installed. To
+  check, open a terminal and type:
       python3 --version
 
-  Si no está instalado, usa el gestor de paquetes de tu
-  distribución:
+  If you don't have it, use your distribution's package
+  manager:
 
     Ubuntu / Debian:
         sudo apt update
@@ -162,171 +158,210 @@ instalado para poder ejecutarlo.
     Arch Linux:
         sudo pacman -S python
 
-Opcional: si quieres usar la verificación en línea (punto 6),
-instala además Playwright (Windows, macOS y Linux por igual):
+Optional: if you want to use the online verification (point 6),
+also install Playwright (same on Windows, macOS and Linux):
 
-    pip install playwright
+    pip install -r requirements-optional.txt
     playwright install chromium
 
-No hace falta si no vas a usar esa función opcional.
+Not needed if you're not going to use that optional feature.
 
 
 ---------------------------------------------------------------
-4. COMO EJECUTAR EL SCRIPT
+4. HOW TO RUN THE SCRIPT
 ---------------------------------------------------------------
 
-  1. Abre una terminal (cmd, PowerShell, Terminal de macOS/Linux)
-     dentro de la carpeta del proyecto (instagram-checker).
-  2. Ejecuta el script con:
+  1. Open a terminal (cmd, PowerShell, macOS/Linux Terminal)
+     inside the project folder (instagram-checker).
+  2. Run the script with:
 
        Windows:      python checker.py
        macOS/Linux:  python3 checker.py
 
-  3. Si el script no encuentra tu nombre de usuario de forma
-     automática (esto ocurre si no incluiste la categoría
-     "Información personal" en tu descarga), te lo pedirá por
-     teclado. Simplemente escríbelo y pulsa Enter.
-  4. Te preguntará si quieres activar la verificación opcional
-     en línea (ver punto 6 más abajo). Puedes responder que no
-     sin problema, es opcional.
-  5. Al terminar, se generará un archivo de texto llamado:
+  3. If the script can't detect your username automatically
+     (this happens if you didn't include the "Personal
+     information" category in your download), it will ask you
+     for it. Just type it and press Enter.
+  4. It will ask whether you want to enable the optional online
+     verification (see point 6 below). You can answer no
+     without any issue, it's optional.
+  5. When it's done, a file will be generated named:
 
-       personas_que_no_te_siguen_de_vuelta_instagram_<tu_usuario>.txt
+       personas_que_no_te_siguen_de_vuelta_instagram_<your_username>.txt
 
-     Ese archivo contiene, uno por línea, el enlace de perfil de
-     cada persona a la que sigues y que no te sigue de vuelta.
+     That file contains, one per line, the profile link of each
+     person you follow who doesn't follow you back.
 
+  Options to avoid answering questions by keyboard (useful if
+  you want to automate the run): when running the script you
+  can add, after "checker.py", any of these options:
 
----------------------------------------------------------------
-5. CUENTAS CUYO ENLACE NO FUNCIONA
----------------------------------------------------------------
+    --verify              Enables online verification without
+                           asking.
+    --no-verify            Disables online verification without
+                           asking.
+    --format txt|csv|json  Output file format (default: txt).
+                           csv or json are useful if you want to
+                           open the result in a spreadsheet or
+                           process it with another program.
 
-Es normal que, dentro del listado generado, algunos enlaces te
-lleven a un "Esta página no está disponible". No es un fallo
-del script: esos usuarios siguen guardados en tu export porque
-Instagram no limpia esa relación de tus datos aunque la cuenta:
+  Example (generates the result as CSV without asking anything):
 
-  - se haya eliminado o desactivado,
-  - haya sido suspendida/baneada por Instagram, o
-  - te haya bloqueado a ti (en ese caso el perfil parece
-    inexistente solo para tu cuenta).
-
-No hay forma de distinguir estos casos solo con el enlace, y da
-igual cuál sea el motivo: la acción a hacer es la misma, dejar
-de seguir a esa cuenta (ver el consejo del siguiente punto).
-
-Para dejar de seguir a estas cuentas, usa tu perfil > Siguiendo,
-en lugar de la barra de búsqueda de Instagram. Las cuentas
-eliminadas, suspendidas o que te han bloqueado no aparecen en
-los resultados de búsqueda, pero siguen visibles (y se pueden
-dejar de seguir) en tu lista de Siguiendo. El propio archivo
-.txt generado incluye este mismo aviso al final.
+       python checker.py --no-verify --format csv
 
 
 ---------------------------------------------------------------
-6. VERIFICACION OPCIONAL EN LINEA (cuentas que ya no existen)
+5. ACCOUNTS WHOSE LINK DOESN'T WORK
 ---------------------------------------------------------------
 
-Al terminar el análisis, el script te pregunta si quieres que
-compruebe, cuenta por cuenta, cuáles de los perfiles que no te
-siguen de vuelta ya no existen (eliminados, suspendidos o que te
-han bloqueado). Es totalmente opcional (por defecto NO se hace)
-y solo se activa si respondes que sí esa vez.
+It's normal for some links in the generated list to lead to a
+"Sorry, this page isn't available." That's not a bug in the
+script: those users are still saved in your export because
+Instagram doesn't clean up that relationship from your data even
+if the account:
 
-Cómo funciona:
+  - was deleted or deactivated,
+  - was suspended/banned by Instagram, or
+  - blocked you (in that case the profile only looks
+    nonexistent to your account).
 
-  - Abre cada perfil en un navegador real (Chromium, mediante la
-    librería Playwright), exactamente como harías tú a mano; no
-    llama a ninguna API interna. Se probó primero haciendo
-    peticiones directas a la API interna de Instagram, pero esa
-    vía bloquea cualquier cliente automatizado casi al instante
-    (incluso con la cabecera correcta y cookies válidas);
-    cargando la página del perfil de verdad, en cambio, funciona
-    con normalidad.
+There's no way to tell these cases apart from the link alone,
+and regardless of the reason, the action to take is the same:
+unfollow that account (see the tip in the next point).
 
-  - NUNCA usa tu inicio de sesión. El navegador entra sin haber
-    iniciado sesión en ninguna cuenta. Si algo sale mal, lo que
-    se puede bloquear temporalmente es la visualización de
-    perfiles sin sesión iniciada, nunca tu cuenta.
-
-  - Necesita tener Playwright instalado (ver el punto 3, más
-    abajo hay que ejecutar además "pip install playwright" y
-    "playwright install chromium"). Si no lo tienes, el script
-    te avisa con el comando exacto y deja esas cuentas marcadas
-    como "no verificadas" en el .txt, en vez de fallar.
-
-  - Comprueba antes si tienes conexión a internet. Si no la hay,
-    no lo intenta: deja todas las cuentas marcadas como "no
-    verificadas (sin conexión)" en el .txt, tal cual se pidió.
-
-  - Va despacio a propósito, con una pausa aleatoria de unos
-    segundos entre cada perfil visitado. Con muchas cuentas
-    puede tardar bastantes minutos (el script te da una
-    estimación antes de empezar).
-
-  - Se detiene sola si Instagram empieza a poner trabas (varias
-    comprobaciones seguidas sin resultado claro, por ejemplo si
-    te redirige a la pantalla de inicio de sesión). En ese caso
-    deja el resto como "no verificadas" en vez de insistir;
-    puedes volver a ejecutar el script más tarde para reintentar
-    con las que falten.
-
-  - Puedes interrumpirla con Ctrl+C en cualquier momento sin
-    perder el progreso: guarda como activas/inaccesibles las
-    cuentas ya comprobadas hasta ese punto, y deja el resto
-    marcado como "no verificadas (interrumpido)" en el .txt. No
-    hace falta esperar a que termine si tarda demasiado.
-
-  - El resultado final separa el .txt en tres bloques: cuentas
-    que siguen activas (no te siguen de verdad), cuentas
-    confirmadas como inaccesibles, y cuentas no verificadas (con
-    el motivo).
-
-Por qué no hay una opción más rápida, ligera o "garantizada":
-Instagram no ofrece ninguna API pública para consultar si una
-cuenta ajena existe. La única forma fiable encontrada es cargar
-la página del perfil en un navegador de verdad, lo que implica
-instalar Playwright (una dependencia bastante más pesada que el
-resto del script) y ejecutar un Chromium en segundo plano. No es
-oficial ni 100% fiable a largo plazo: puede dejar de funcionar
-si Instagram cambia su web. Es normal, y no indica ningún
-problema con tus datos.
+To unfollow these accounts, use your profile > Following,
+instead of Instagram's search bar. Deleted, suspended, or
+blocking accounts don't show up in search results, but they're
+still visible (and can be unfollowed) in your Following list.
+The generated .txt file itself includes this same reminder at
+the end.
 
 
 ---------------------------------------------------------------
-SOLUCION DE PROBLEMAS
+6. OPTIONAL ONLINE VERIFICATION (accounts that no longer exist)
 ---------------------------------------------------------------
 
-Se crea un archivo vacío llamado "python" (o similar) al
-ejecutar el script.
+When the analysis is done, the script asks whether you want it
+to check, account by account, which of the profiles that don't
+follow you back no longer exist (deleted, suspended, or blocking
+you). It's entirely optional (OFF by default) and only runs if
+you answer yes that time, or if you run the script with
+--verify (see point 4).
 
-  El script no crea ningún archivo con ese nombre. Si te
-  aparece, casi siempre es porque el comando ejecutado incluía
-  una redirección de salida por accidente, por ejemplo:
+How it works:
+
+  - Opens each profile in a real browser (Chromium, via the
+    Playwright library), exactly like you would by hand; it
+    doesn't call any internal API. It was first tried making
+    direct requests to Instagram's internal API, but that route
+    blocks any automated client almost instantly (even with the
+    right header and valid cookies); actually loading the
+    profile page, on the other hand, works normally.
+
+  - Checks TWO different signals to decide whether a profile no
+    longer exists: the browser tab's title and a piece of text
+    from the page's own content. That way, if Instagram changes
+    the wording of one of the two, the other acts as a backup
+    and the script doesn't go "blind" all at once.
+
+  - NEVER uses your login. The browser signs in to no account at
+    all. If something goes wrong, the worst case is that
+    viewing logged-out profiles gets temporarily blocked, never
+    your own account.
+
+  - Requires Playwright installed (see point 3; you'll also need
+    to run "pip install -r requirements-optional.txt" and
+    "playwright install chromium"). If you don't have it, the
+    script tells you the exact command and marks those accounts
+    as "unverified" in the result, instead of failing.
+
+  - Checks for an internet connection first. If there isn't one,
+    it doesn't even try: it marks all accounts as "unverified
+    (no connection)", as requested.
+
+  - Goes slowly on purpose, with a random pause of a few seconds
+    between each profile visited. With many accounts this can
+    take several minutes (the script gives you an estimate
+    before starting).
+
+  - Stops itself if Instagram starts pushing back (several
+    checks in a row with no clear result, e.g. if you get
+    redirected to the login screen). In that case it leaves the
+    rest as "unverified" instead of insisting.
+
+  - You can interrupt it with Ctrl+C at any point without losing
+    progress: every result is saved as it happens (see
+    "Remembers what's already been checked" below), so there's
+    no need to wait for it to finish if it's taking too long.
+
+  - The final result splits the file into three groups: accounts
+    still active (they really don't follow you back), accounts
+    confirmed inaccessible, and unverified accounts (with the
+    reason why).
+
+  REMEMBERS WHAT'S ALREADY BEEN CHECKED BETWEEN RUNS
+
+  Every result from this verification is saved in a file called
+  "verificacion_cache.json", next to checker.py. Thanks to this:
+
+    - Accounts already confirmed as active or nonexistent in a
+      previous run are NOT checked again the next time.
+    - Accounts that were left as "unverified" (due to blocking,
+      an interruption, etc.) are automatically retried first,
+      before new accounts, the next time you enable
+      verification.
+
+  In practice this means only the first run, with many accounts,
+  really takes a while; later runs get progressively faster. If
+  you ever want everything checked again from scratch, just
+  delete that file.
+
+Why there's no faster, lighter, or "guaranteed" option:
+Instagram doesn't offer any public API to check whether someone
+else's account exists. The only reliable method found is loading
+the actual profile page in a real browser, which means installing
+Playwright (a considerably heavier dependency than the rest of
+the script) and running a Chromium instance in the background.
+It isn't official or 100% reliable long-term: it can stop working
+if Instagram changes its website. That's normal, and doesn't
+indicate any problem with your data.
+
+
+---------------------------------------------------------------
+TROUBLESHOOTING
+---------------------------------------------------------------
+
+An empty file named "python" (or similar) gets created when
+running the script.
+
+  The script doesn't create any file with that name. If you see
+  it, it's almost always because the command you ran included an
+  accidental output redirection, for example:
 
       python checker.py > python
 
-  en vez de:
+  instead of:
 
       python checker.py
 
-  Revisa que el comando no tenga un ">" de más (puede colarse
-  al pegar el comando o al reutilizar una línea del historial
-  de la terminal con la flecha de arriba) y bórralo si aparece;
-  no afecta al funcionamiento del script.
+  Check the command for a stray ">" (it can sneak in when
+  pasting the command or reusing a line from your terminal
+  history with the up arrow) and remove it if present; it
+  doesn't affect how the script works.
 
 
 ---------------------------------------------------------------
-NOTAS FINALES
+FINAL NOTES
 ---------------------------------------------------------------
 
-- Por defecto, este script no se conecta a internet ni envía tus
-  datos a ningún sitio: todo el análisis se hace en local,
-  leyendo los archivos JSON que ya tienes descargados. La única
-  excepción es la verificación opcional en línea (punto 6): si
-  la activas explícitamente, el script consulta a Instagram, de
-  forma anónima y sin tu login, el nombre de usuario de cada
-  cuenta que no te sigue de vuelta.
-- Puedes volver a ejecutar el script cuando quieras, siempre que
-  actualices el contenido de la carpeta con los datos (la que
-  sea) con una descarga más reciente.
+- By default, this script doesn't connect to the internet or
+  send your data anywhere: all of the analysis happens locally,
+  reading the JSON files you already downloaded, and saving its
+  results (including the verification cache) in the same project
+  folder. The only exception is the optional online verification
+  (point 6): if you explicitly enable it, the script asks
+  Instagram, anonymously and without your login, for the
+  username of each account that doesn't follow you back.
+- You can run the script again whenever you want, as long as you
+  update the contents of the data folder (whichever one it is)
+  with a more recent download.
