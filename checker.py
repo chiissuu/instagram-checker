@@ -335,7 +335,7 @@ def hay_playwright() -> bool:
 
 
 # 4.3 · verificar_cuenta_instagram
-def verificar_cuenta_instagram(pagina: "Page", usuario: str) -> str:
+def verificar_cuenta_instagram(pagina: Page, usuario: str) -> str:
     """
     Comprueba, sin iniciar sesión, si el perfil de un usuario sigue
     existiendo/siendo accesible, cargando su página real con un

@@ -1,0 +1,7 @@
+line-length = 160
+
+[lint]
+# E/F: errores de estilo y de pyflakes (variables sin usar, etc.)
+# I: orden de imports
+# UP: sintaxis moderna de Python
+select = ["E", "F", "I", "UP"]

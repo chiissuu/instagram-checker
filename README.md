@@ -2,9 +2,15 @@
 
 # Instagram Checker
 
+[![Tests](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml/badge.svg)](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 Python script that compares your Instagram **followers** and **following** using the official export of your data, and generates a list of the people you follow who don't follow you back.
 
 The core analysis runs **entirely locally**: the script only reads the JSON files you download from Instagram yourself. It can optionally connect to Instagram to check which of those accounts no longer exist (see [Optional online verification](#optional-online-verification-accounts-that-no-longer-exist)), but only if you explicitly ask for it each time.
+
+Want to see it working without using your own data? Check the [`demo` branch](https://github.com/chiissuu/instagram-checker/tree/demo) — same tool, run against a synthetic (fake) export with no real accounts involved.
 
 ## What it generates
 

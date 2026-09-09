@@ -2,9 +2,15 @@
 
 # Instagram Checker
 
+[![Tests](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml/badge.svg)](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 Script en Python que compara tus **seguidores** y **seguidos** de Instagram a partir del export oficial de tus datos, y genera un listado con las personas a las que sigues pero que no te siguen de vuelta.
 
 Todo el análisis principal se hace **en local**: el script solo lee los archivos JSON que tú mismo descargas de Instagram. Opcionalmente puede conectarse a Instagram para comprobar cuáles de esas cuentas ya no existen (ver [Verificación opcional en línea](#verificación-opcional-en-línea-cuentas-que-ya-no-existen)), pero solo si tú lo pides explícitamente cada vez.
+
+¿Quieres verlo funcionando sin usar tus propios datos? Mira la [rama `demo`](https://github.com/chiissuu/instagram-checker/tree/demo) — la misma herramienta, ejecutada sobre un export sintético (ficticio), sin ninguna cuenta real de por medio.
 
 ## Qué genera
 
