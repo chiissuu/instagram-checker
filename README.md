@@ -162,3 +162,7 @@ El script no crea ningún archivo con ese nombre. Si te aparece, casi siempre es
 ## Privacidad
 
 Por defecto, ningún dato sale de tu ordenador: el script únicamente lee los `.json` que tú descargaste desde tu cuenta de Instagram. La única excepción es la [verificación opcional en línea](#verificación-opcional-en-línea-cuentas-que-ya-no-existen): si la activas explícitamente, el script consulta a Instagram (de forma anónima, sin tu login) el nombre de usuario de cada cuenta que no te sigue de vuelta, para saber si sigue existiendo.
+
+## Licencia
+
+[MIT](LICENSE) — puedes usar, copiar y modificar este proyecto libremente.
