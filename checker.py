@@ -1,3 +1,17 @@
+# --------------------------------------------------------------------------
+# Programa: checker.py (instagram-checker)
+# Autor: Jesús León Romero
+# Fecha de última modificación: 09/09/2026
+# Descripción: Compara tus seguidores y seguidos de Instagram a partir del
+#              export oficial de tus datos (JSON) y genera un listado de
+#              quién no te sigue de vuelta, con verificación opcional en
+#              línea (Playwright) y caché entre ejecuciones.
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# 1 · Librerías, importaciones y constantes
+# --------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import argparse
@@ -16,6 +30,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from playwright.sync_api import Page
 
+# `from __future__ import annotations` permite escribir los type hints con
+# la sintaxis moderna (list[str], str | None...) aunque se ejecute en una
+# versión de Python algo más antigua, porque Python no llega a evaluar las
+# anotaciones en tiempo de ejecución, solo las guarda como texto.
+#
+# TYPE_CHECKING es una constante que solo es True para herramientas como
+# mypy, nunca en ejecución real. Así se puede usar el tipo "Page" de
+# Playwright para los type hints sin obligar a que Playwright esté
+# instalado para poder ejecutar el script (es una dependencia opcional).
+
 BASE_DIR = Path(__file__).resolve().parent
 
 TITULO_PERFIL_NO_DISPONIBLE = "Profile isn't available • Instagram"
@@ -27,9 +51,10 @@ CACHE_PATH = BASE_DIR / "verificacion_cache.json"
 
 
 # --------------------------------------------------------------------------
-# Lectura de los datos exportados por Instagram
+# 2 · Lectura de los datos exportados por Instagram
 # --------------------------------------------------------------------------
 
+# 2.1 · limpiar_usuario
 def limpiar_usuario(usuario: str | None) -> str | None:
     if not usuario:
         return None
@@ -43,12 +68,17 @@ def limpiar_usuario(usuario: str | None) -> str | None:
     return usuario
 
 
+# 2.2 · extraer_usuario_desde_href
 def extraer_usuario_desde_href(href: str | None) -> str | None:
     if not href:
         return None
 
     href = href.strip().split("?")[0].rstrip("/")
 
+    # Instagram guarda los enlaces de perfil de dos formas distintas según
+    # la parte del export: a veces como URL normal (.../nombre_usuario) y
+    # a veces con un prefijo "/_u/" (una especie de enlace corto interno).
+    # Se comprueban las dos para no perder usuarios según el formato.
     if "/_u/" in href:
         usuario = href.split("/_u/")[-1]
         return limpiar_usuario(usuario)
@@ -60,6 +90,7 @@ def extraer_usuario_desde_href(href: str | None) -> str | None:
     return None
 
 
+# 2.3 · extraer_followers
 def extraer_followers(path: Path) -> set[str]:
     """
     Extrae usuarios desde followers_1.json.
@@ -68,6 +99,11 @@ def extraer_followers(path: Path) -> set[str]:
     data = json.loads(path.read_text(encoding="utf-8"))
     usuarios: set[str] = set()
 
+    # Se recorre el JSON recursivamente (en vez de acceder a una ruta fija
+    # tipo data[0]["string_list_data"]) porque Instagram no siempre anida
+    # "string_list_data" a la misma profundidad: cambia según el método de
+    # descarga y la versión del export. Bajando por cualquier dict/list que
+    # aparezca, se encuentra igual sin importar cómo esté envuelto.
     def recorrer(obj: object) -> None:
         if isinstance(obj, dict):
             if "string_list_data" in obj:
@@ -92,6 +128,7 @@ def extraer_followers(path: Path) -> set[str]:
     return {u for u in usuarios if u}
 
 
+# 2.4 · extraer_following
 def extraer_following(path: Path) -> set[str]:
     """
     Extrae usuarios desde following.json.
@@ -118,6 +155,7 @@ def extraer_following(path: Path) -> set[str]:
     return {u for u in usuarios if u}
 
 
+# 2.5 · buscar_nombre_cuenta
 def buscar_nombre_cuenta() -> str | None:
     """
     Busca el username del dueño de la cuenta en personal_information.json
@@ -132,6 +170,11 @@ def buscar_nombre_cuenta() -> str | None:
 
         resultado: str | None = None
 
+        # Misma idea que en extraer_followers: se recorre todo el árbol
+        # del JSON porque no se puede confiar en una ruta fija. "nonlocal"
+        # permite que esta función interna escriba en "resultado", que
+        # pertenece a la función de fuera; en cuanto lo encuentra, corta
+        # la recursión sin seguir bajando por el resto del árbol.
         def recorrer(obj: object) -> None:
             nonlocal resultado
             if resultado:
@@ -162,11 +205,19 @@ def buscar_nombre_cuenta() -> str | None:
     return None
 
 
+# 2.6 · nombre_archivo_seguro
 def nombre_archivo_seguro(texto: str) -> str:
+    # Sustituye cualquier carácter que Windows/macOS/Linux no permitan en
+    # un nombre de archivo (\ / * ? : " < > | y espacios) por "_".
     return re.sub(r'[\\/*?:"<>|\s]', "_", texto).strip("_")
 
 
+# 2.7 · buscar_archivo_exacto
 def buscar_archivo_exacto(nombre_archivo: str) -> list[Path]:
+    # Busca en TODAS las carpetas y subcarpetas junto a checker.py (rglob
+    # = recursive glob), no solo en la carpeta actual, porque el usuario
+    # puede haber colocado el export de Instagram en cualquier subcarpeta
+    # con cualquier nombre.
     encontrados = [
         archivo
         for archivo in BASE_DIR.rglob("*.json")
@@ -177,9 +228,13 @@ def buscar_archivo_exacto(nombre_archivo: str) -> list[Path]:
 
 
 # --------------------------------------------------------------------------
-# Caché de verificación (evita re-comprobar en Instagram lo ya comprobado)
+# 3 · Caché de verificación entre ejecuciones
 # --------------------------------------------------------------------------
+# Objetivo de esta sección: no repetir en Instagram una comprobación que
+# ya se hizo en una ejecución anterior. Cada usuario comprobado se guarda
+# en CACHE_PATH con su resultado, para poder reutilizarlo la próxima vez.
 
+# 3.1 · cargar_cache
 def cargar_cache() -> dict[str, dict[str, str]]:
     if not CACHE_PATH.exists():
         return {}
@@ -187,9 +242,13 @@ def cargar_cache() -> dict[str, dict[str, str]]:
     try:
         return json.loads(CACHE_PATH.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
+        # Si el archivo está corrupto o no se puede leer, se empieza de
+        # cero en vez de romper el script: perder la caché no es grave,
+        # solo hace que se vuelva a comprobar todo.
         return {}
 
 
+# 3.2 · guardar_cache
 def guardar_cache(cache: dict[str, dict[str, str]]) -> None:
     try:
         CACHE_PATH.write_text(json.dumps(cache, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -197,7 +256,12 @@ def guardar_cache(cache: dict[str, dict[str, str]]) -> None:
         pass
 
 
+# 3.3 · actualizar_cache
 def actualizar_cache(cache: dict[str, dict[str, str]], usuario: str, estado: str) -> None:
+    # Se guarda en disco en cada llamada (no solo al final) para que un
+    # Ctrl+C o un cierre inesperado a mitad de la verificación no pierda
+    # el progreso ya hecho: ver el uso de esta función dentro del bucle
+    # de verificar_cuentas().
     cache[usuario] = {
         "estado": estado,
         "verificado_en": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -205,6 +269,7 @@ def actualizar_cache(cache: dict[str, dict[str, str]], usuario: str, estado: str
     guardar_cache(cache)
 
 
+# 3.4 · separar_por_cache
 def separar_por_cache(
     usuarios: list[str], cache: dict[str, dict[str, str]]
 ) -> tuple[list[str], list[str], list[str], list[str]]:
@@ -236,15 +301,19 @@ def separar_por_cache(
         elif estado == "no_existe":
             ya_fantasma.append(usuario)
         else:
+            # Cualquier otro valor (normalmente "no_verificable") se trata
+            # como pendiente de reintentar: la última vez no se pudo saber
+            # con seguridad si la cuenta existía o no.
             a_reintentar.append(usuario)
 
     return ya_activas, ya_fantasma, a_reintentar, nuevas
 
 
 # --------------------------------------------------------------------------
-# Verificación en línea (Playwright)
+# 4 · Verificación en línea (Playwright)
 # --------------------------------------------------------------------------
 
+# 4.1 · hay_conexion_internet
 def hay_conexion_internet() -> bool:
     try:
         urllib.request.urlopen("https://www.instagram.com", timeout=6)
@@ -253,7 +322,11 @@ def hay_conexion_internet() -> bool:
         return False
 
 
+# 4.2 · hay_playwright
 def hay_playwright() -> bool:
+    # Import de prueba: si Playwright no está instalado, ImportError avisa
+    # de que hay que desactivar toda la verificación en línea en vez de
+    # dejar que el script explote más adelante con un error críptico.
     try:
         import playwright.sync_api  # noqa: F401
         return True
@@ -261,6 +334,7 @@ def hay_playwright() -> bool:
         return False
 
 
+# 4.3 · verificar_cuenta_instagram
 def verificar_cuenta_instagram(pagina: "Page", usuario: str) -> str:
     """
     Comprueba, sin iniciar sesión, si el perfil de un usuario sigue
@@ -280,14 +354,24 @@ def verificar_cuenta_instagram(pagina: "Page", usuario: str) -> str:
         pagina.goto(url, timeout=15000, wait_until="domcontentloaded")
         pagina.wait_for_timeout(1200)  # deja que cargue el título dinámico
 
+        # Si Instagram redirige a login o a una pantalla de verificación,
+        # no es que la cuenta no exista: es que Instagram está poniendo
+        # trabas a esta visita en concreto. Se marca como "no_verificable"
+        # en vez de arriesgarse a un falso "no existe".
         if "/accounts/login" in pagina.url or "/challenge" in pagina.url:
             return "no_verificable"
 
         titulo = (pagina.title() or "").strip()
 
+        # Señal 1: el título exacto que pone Instagram en la pestaña
+        # cuando un perfil no está disponible.
         if titulo == TITULO_PERFIL_NO_DISPONIBLE:
             return "no_existe"
 
+        # Señal 2 (de respaldo): el mismo aviso, pero buscado dentro del
+        # contenido visible de la página en vez de en el título. Es un
+        # extra: si esta comprobación falla por lo que sea, se ignora el
+        # error y se sigue confiando solo en el título (señal 1).
         try:
             if pagina.get_by_text(TEXTO_PERFIL_NO_DISPONIBLE, exact=False).count() > 0:
                 return "no_existe"
@@ -303,6 +387,7 @@ def verificar_cuenta_instagram(pagina: "Page", usuario: str) -> str:
         return "no_verificable"
 
 
+# 4.4 · verificar_cuentas
 def verificar_cuentas(
     usuarios: list[str], cache: dict[str, dict[str, str]]
 ) -> tuple[list[str], list[str], list[str], bool]:
@@ -322,7 +407,7 @@ def verificar_cuentas(
     activas: list[str] = []
     fantasma: list[str] = []
     no_verificadas: list[str] = []
-    fallos_seguidos = 0
+    fallos_seguidos = 0  # cuenta los "no_verificable" consecutivos, ver más abajo
     interrumpido = False
 
     total = len(usuarios)
@@ -337,6 +422,8 @@ def verificar_cuentas(
                 try:
                     resultado = verificar_cuenta_instagram(pagina, usuario)
                 except KeyboardInterrupt:
+                    # Ctrl+C mientras se comprobaba ESTE usuario en concreto:
+                    # se guarda como no verificado y se corta el bucle.
                     print(f"\nInterrumpido por el usuario tras revisar {indice - 1} de {total} cuentas.")
                     print("Se guarda lo comprobado hasta ahora; el resto queda como 'no verificado'.")
                     no_verificadas.extend(usuarios[indice - 1:])
@@ -355,6 +442,10 @@ def verificar_cuentas(
                     fallos_seguidos += 1
                     no_verificadas.append(usuario)
 
+                    # Varios "no_verificable" seguidos (no sueltos entre
+                    # medias de resultados claros) es la señal de que
+                    # Instagram ha empezado a bloquear las visitas: mejor
+                    # parar aquí que seguir insistiendo cuenta por cuenta.
                     if fallos_seguidos >= MAX_FALLOS_SEGUIDOS:
                         print(
                             f"Instagram ha empezado a poner trabas a las comprobaciones "
@@ -370,6 +461,8 @@ def verificar_cuentas(
                 try:
                     time.sleep(random.uniform(PAUSA_MINIMA_SEGUNDOS, PAUSA_MAXIMA_SEGUNDOS))
                 except KeyboardInterrupt:
+                    # Ctrl+C durante la pausa entre cuentas (en vez de
+                    # durante la comprobación en sí): mismo tratamiento.
                     print(f"\nInterrumpido por el usuario tras revisar {indice} de {total} cuentas.")
                     print("Se guarda lo comprobado hasta ahora; el resto queda como 'no verificado'.")
                     no_verificadas.extend(usuarios[indice:])
@@ -394,14 +487,15 @@ def verificar_cuentas(
 
 
 # --------------------------------------------------------------------------
-# Construcción y escritura del resultado
+# 5 · Construcción y escritura del resultado
 # --------------------------------------------------------------------------
 
+# 5.1 · Fila (una línea del resultado final)
 @dataclass
 class Fila:
     usuario: str
     categoria: str  # "sin_verificar" | "activa" | "fantasma" | "no_verificada"
-    motivo: str | None = None
+    motivo: str | None = None  # solo relevante si categoria == "no_verificada"
 
 
 MOTIVOS_NO_VERIFICADO = {
@@ -417,6 +511,7 @@ MOTIVOS_NO_VERIFICADO = {
 }
 
 
+# 5.2 · construir_filas
 def construir_filas(
     no_te_siguen_de_vuelta: list[str],
     hacer_verificacion: bool,
@@ -425,6 +520,10 @@ def construir_filas(
     no_verificadas: list[str],
     motivo_no_verificado: str | None,
 ) -> list[Fila]:
+    # Punto único donde se decide cómo se reparte cada usuario en
+    # categorías, antes de escribirlo en cualquiera de los tres formatos
+    # de salida (txt/csv/json): así los tres formatos parten siempre de
+    # exactamente los mismos datos.
     if not hacer_verificacion:
         return [Fila(usuario=u, categoria="sin_verificar") for u in no_te_siguen_de_vuelta]
 
@@ -434,6 +533,7 @@ def construir_filas(
     return filas
 
 
+# 5.3 · escribir_txt
 def escribir_txt(output_path: Path, filas: list[Fila], hacer_verificacion: bool) -> None:
     activas = [f.usuario for f in filas if f.categoria in ("sin_verificar", "activa")]
     fantasma = [f.usuario for f in filas if f.categoria == "fantasma"]
@@ -460,6 +560,9 @@ def escribir_txt(output_path: Path, filas: list[Fila], hacer_verificacion: bool)
 
             if no_verificadas:
                 f.write(f"\n--- No verificadas ({len(no_verificadas)}) ---\n")
+                # Todas las filas "no_verificada" de una misma ejecución
+                # comparten el mismo motivo, así que basta con leer el de
+                # la primera para explicar el bloque entero.
                 motivo = no_verificadas[0].motivo
                 f.write(MOTIVOS_NO_VERIFICADO.get(motivo, MOTIVOS_NO_VERIFICADO["bloqueo"]) + "\n\n")
                 for fila in no_verificadas:
@@ -482,6 +585,7 @@ def escribir_txt(output_path: Path, filas: list[Fila], hacer_verificacion: bool)
         )
 
 
+# 5.4 · escribir_csv
 def escribir_csv(output_path: Path, filas: list[Fila]) -> None:
     with open(output_path, "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
@@ -495,6 +599,7 @@ def escribir_csv(output_path: Path, filas: list[Fila]) -> None:
             ])
 
 
+# 5.5 · escribir_json
 def escribir_json(output_path: Path, filas: list[Fila]) -> None:
     data = [
         {
@@ -509,13 +614,16 @@ def escribir_json(output_path: Path, filas: list[Fila]) -> None:
 
 
 # --------------------------------------------------------------------------
-# CLI y punto de entrada
+# 6 · CLI y punto de entrada
 # --------------------------------------------------------------------------
 
+# 6.1 · parse_args
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Compara tus seguidores y seguidos de Instagram a partir del export oficial de tus datos."
     )
+    # Grupo mutuamente excluyente: no tiene sentido pasar --verify y
+    # --no-verify a la vez, así que argparse rechaza esa combinación sola.
     grupo_verificacion = parser.add_mutually_exclusive_group()
     grupo_verificacion.add_argument(
         "--verify", action="store_true",
@@ -532,9 +640,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+# 6.2 · main
 def main() -> None:
     args = parse_args()
 
+    # --- Paso 1: localizar y leer el export de Instagram ---
     archivos_followers = buscar_archivo_exacto("followers_1.json")
     archivos_following = buscar_archivo_exacto("following.json")
 
@@ -557,6 +667,7 @@ def main() -> None:
     for archivo in archivos_following:
         following.update(extraer_following(archivo))
 
+    # --- Paso 2: calcular quién no sigue de vuelta (resta de conjuntos) ---
     no_te_siguen_de_vuelta = sorted(following - followers)
 
     nombre_cuenta = buscar_nombre_cuenta()
@@ -575,6 +686,9 @@ def main() -> None:
     print(f"Personas que te siguen: {len(followers)}")
     print(f"No te siguen de vuelta: {len(no_te_siguen_de_vuelta)}")
 
+    # --- Paso 3: decidir si se hace la verificación en línea ---
+    # Los flags de CLI mandan sobre la pregunta interactiva; si no se pasó
+    # ninguno de los dos, se pregunta por teclado como antes.
     if args.verify:
         hacer_verificacion = bool(no_te_siguen_de_vuelta)
     elif args.no_verify:
@@ -601,6 +715,7 @@ def main() -> None:
     no_verificadas: list[str] = []
     motivo_no_verificado: str | None = None
 
+    # --- Paso 4: verificación en línea, si toca (con sus 3 salidas posibles) ---
     if hacer_verificacion:
         if not hay_conexion_internet():
             print("No se ha detectado conexión a internet: se omite la comprobación.")
@@ -618,8 +733,14 @@ def main() -> None:
             no_verificadas = list(no_te_siguen_de_vuelta)
             motivo_no_verificado = "sin_playwright"
         else:
+            # Caso normal: hay conexión y Playwright instalado. Antes de
+            # abrir el navegador, se aprovecha la caché de ejecuciones
+            # anteriores para no repetir trabajo ya hecho.
             cache = cargar_cache()
             ya_activas, ya_fantasma, a_reintentar, nuevas = separar_por_cache(no_te_siguen_de_vuelta, cache)
+            # Los reintentos van primero: son cuentas que quedaron a
+            # medias la última vez, así que tienen prioridad sobre las
+            # que todavía no se han comprobado nunca.
             a_verificar = a_reintentar + nuevas
 
             if a_reintentar:
@@ -648,6 +769,7 @@ def main() -> None:
             print(f"Cuentas que ya no existen o no son accesibles: {len(fantasma)}")
             print(f"Cuentas no verificadas: {len(no_verificadas)}")
 
+    # --- Paso 5: construir y escribir el resultado, en el formato pedido ---
     filas = construir_filas(no_te_siguen_de_vuelta, hacer_verificacion, activas, fantasma, no_verificadas, motivo_no_verificado)
 
     if args.format == "csv":
