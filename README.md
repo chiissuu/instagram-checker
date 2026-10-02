@@ -1,4 +1,4 @@
-🇬🇧 English (you're here) · 🇪🇸 [Español](README.es.md)
+🇬🇧 English (you're here) · 🇪🇸 [Español](READMEs/README.es.md)
 
 # Instagram Checker
 

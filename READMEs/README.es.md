@@ -1,10 +1,10 @@
-🇬🇧 [English](README.md) · 🇪🇸 Español (estás aquí)
+🇬🇧 [English](../README.md) · 🇪🇸 Español (estás aquí)
 
 # Instagram Checker
 
 [![Tests](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml/badge.svg)](https://github.com/chiissuu/instagram-checker/actions/workflows/tests.yml)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](../LICENSE)
 
 Script en Python que compara tus **seguidores** y **seguidos** de Instagram a partir del export oficial de tus datos, y genera un listado con las personas a las que sigues pero que no te siguen de vuelta.
 
